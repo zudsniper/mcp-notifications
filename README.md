@@ -5,9 +5,11 @@ Lightweight Node.js server sending Feishu webhook notifications. Ideal for devs 
 
 ## Installation
 Setup BrowserTools MCP Tool:
-1. Go to your ‘Cursor Settings’
-2. Go to Features, scroll down to MCP Servers and click on ‘Add new MCP server’
-3. Give it a unique name (mcp-server-notifier), set type to ‘command’ and set command to:
+1. Go to your 'Cursor Settings'
+2. Go to Features, scroll down to MCP Servers and click on 'Add new MCP server'
+![MCP Server Setup](/docs/guide.jpg)
+
+3. Give it a unique name (mcp-server-notifier), set type to 'command' and set command to:
 
 `env FEISHU_WEBHOOK_URL=[YOUR WEBHOOK URL] npx mcp-server-notifier`
 
