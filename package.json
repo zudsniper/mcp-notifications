@@ -1,6 +1,9 @@
 {
   "name": "mcp-server-notifier",
-  "version": "1.0.0",
+  "bin": {
+    "mcp-server-notifier": "./build/index.js"
+  },
+  "version": "1.0.4",
   "description": "Lightweight Node.js server sending Feishu webhook notifications. Ideal for devs using AI agents (e.g., Cursor) on multi-projects, alerting task completion for efficient switching. Features webhook alerts, multi-project dev, AI integration, easy setup for dev tools &amp; automation.",
   "main": "build/index.js",
   "author": "tuberrabbit@gmail.com",
