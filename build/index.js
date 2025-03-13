@@ -5,7 +5,7 @@ import { z } from "zod";
 // Create an MCP server
 const server = new McpServer({
     name: "mcp-server-notifier",
-    version: "1.0.4"
+    version: "1.0.5"
 });
 // Async tool with external API call
 server.tool("notify-feishu", { message: z.string() }, async ({ message }) => {

@@ -11,7 +11,7 @@ Setup BrowserTools MCP Tool:
 
 3. Give it a unique name (mcp-server-notifier), set type to 'command' and set command to:
 
-`env FEISHU_WEBHOOK_URL=[YOUR WEBHOOK URL] npx mcp-server-notifier`
+`env FEISHU_WEBHOOK_URL=[YOUR WEBHOOK URL] npx -y mcp-server-notifier`
 
 ## Usage
 
