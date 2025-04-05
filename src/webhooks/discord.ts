@@ -14,12 +14,12 @@ export class DiscordWebhookFormatter extends BaseWebhookFormatter {
 
     // Add URL if provided
     if (message.link) {
-      embed.url = message.link;
+      (embed as any).url = message.link;
     }
 
     // Add image if provided
     if (message.imageUrl) {
-      embed.image = {
+      (embed as any).image = {
         url: message.imageUrl
       };
     }

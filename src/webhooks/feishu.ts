@@ -30,7 +30,7 @@ export class FeishuWebhookFormatter extends BaseWebhookFormatter {
         tag: 'a',
         text: 'Open Link',
         href: message.link
-      });
+      } as any);
     }
 
     // Build the post format

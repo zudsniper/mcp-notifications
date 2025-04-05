@@ -17,7 +17,7 @@ export class TeamsWebhookFormatter extends BaseWebhookFormatter {
 
     // Add image if provided
     if (message.imageUrl) {
-      sections[0].activityImage = message.imageUrl;
+      (sections[0] as any).activityImage = message.imageUrl;
     }
 
     // Add link if provided
