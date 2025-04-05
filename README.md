@@ -5,9 +5,11 @@ A lightweight notification service that integrates with MCP (Model Context Proto
 ## Features
 
 - **Webhook Notifications**: Receive alerts when your AI agents complete tasks
+- **Multiple Webhook Providers**: Support for Discord, Slack, Microsoft Teams, Feishu, and custom webhooks
+- **Image Support**: Include images in notifications via Imgur
 - **Multi-Project Support**: Efficiently manage notifications across different projects
 - **Easy Integration**: Simple setup with AI tools like Cursor
-- **Customizable Messages**: Send personalized notifications
+- **Customizable Messages**: Send personalized notifications with title, body, and links
 
 ## Installation
 
@@ -29,15 +31,46 @@ Setup as a BrowserTools MCP Tool:
 - Ask your AI agent to notify you with a custom message when a task is complete
 - Configure it as a persistent rule in Cursor settings to avoid repeating the setup
 
+For detailed usage instructions, see the [Usage Guide](./docs/USAGE.md).
+
 ## Configuration
 
-By default, the notifier supports several webhook types. You can specify the webhook type and URL through environment variables:
+By default, the notifier supports several webhook types:
+
+- Discord
+- Slack
+- Microsoft Teams
+- Feishu
+- Generic JSON
+
+You can specify the webhook type and URL through environment variables:
 
 ```bash
 env WEBHOOK_URL="https://your-webhook-url" WEBHOOK_TYPE="discord" npx -y mcp-server-notifier
 ```
 
-For more advanced configuration, see the [Advanced Configuration](#advanced-configuration) section.
+### Configuration File
+
+For more advanced configuration, you can create a `webhook-config.json` file:
+
+```json
+{
+  "webhook": {
+    "type": "discord",
+    "url": "https://discord.com/api/webhooks/your-webhook-url",
+    "name": "My Notifier"
+  },
+  "imgur": {
+    "clientId": "your-imgur-client-id"
+  }
+}
+```
+
+See the [Configuration Guide](./docs/CONFIGURATION.md) for full details and examples.
+
+## Example Configurations
+
+Example webhook configurations are available in the [examples](./examples) directory.
 
 ## Internationalization
 

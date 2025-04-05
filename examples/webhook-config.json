@@ -1,0 +1,10 @@
+{
+  "webhook": {
+    "type": "discord",
+    "url": "https://discord.com/api/webhooks/your-webhook-url",
+    "name": "My Discord Notifier"
+  },
+  "imgur": {
+    "clientId": "your-imgur-client-id"
+  }
+}

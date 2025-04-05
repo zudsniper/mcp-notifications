@@ -1,0 +1,11 @@
+{
+  "webhook": {
+    "type": "custom",
+    "url": "https://your-custom-webhook-endpoint.com/hook",
+    "name": "Custom Webhook"
+  },
+  "imgur": {
+    "clientId": "your-imgur-client-id",
+    "apiUrl": "https://api.imgur.com/3/image"
+  }
+}

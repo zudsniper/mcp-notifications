@@ -4,7 +4,7 @@
     "mcp-server-notifier": "./build/index.js"
   },
   "version": "1.0.5",
-  "description": "Lightweight Node.js server sending Feishu webhook notifications. Ideal for devs using AI agents (e.g., Cursor) on multi-projects, alerting task completion for efficient switching. Features webhook alerts, multi-project dev, AI integration, easy setup for dev tools &amp; automation.",
+  "description": "Lightweight Node.js server for sending webhook notifications. Supports Discord, Slack, Teams, Feishu, and custom webhooks. Ideal for AI-assisted developers working across multiple projects.",
   "main": "build/index.js",
   "author": "tuberrabbit@gmail.com",
   "repository": {
@@ -14,11 +14,15 @@
   "keywords": [
     "mcp",
     "feishu",
+    "discord",
+    "slack",
+    "teams",
     "webhook",
     "notification",
     "ai",
     "developer",
-    "tool"
+    "tool",
+    "imgur"
   ],
   "type": "module",
   "scripts": {
@@ -28,7 +32,8 @@
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1"
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

@@ -1,0 +1,7 @@
+{
+  "webhook": {
+    "type": "teams",
+    "url": "https://outlook.office.com/webhook/your-teams-webhook-url",
+    "name": "Teams Task Notifier"
+  }
+}
