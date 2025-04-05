@@ -1,19 +1,44 @@
-# mcp-server-notifier
-Lightweight Node.js server sending Feishu webhook notifications. Ideal for devs using AI agents (e.g., Cursor) on multi-projects, alerting task completion for efficient switching. Features webhook alerts, multi-project dev, AI integration, easy setup for dev tools &amp; automation.
+# MCP Server Notifier
 
-轻量 Node.js 服务器，向飞书 webhook 发送通知。适合开发者用 AI 代理（如 Cursor）开发多项目，任务完成后自动通知，提升效率。支持 webhook 通知、任务提醒、多项目开发、AI 集成，易安装配置，优化开发者工具与自动化工作流。
+A lightweight notification service that integrates with MCP (Model Context Protocol) to send webhooks when AI agents complete tasks. Perfect for developers working across multiple projects who need notifications when background tasks are completed.
+
+## Features
+
+- **Webhook Notifications**: Receive alerts when your AI agents complete tasks
+- **Multi-Project Support**: Efficiently manage notifications across different projects
+- **Easy Integration**: Simple setup with AI tools like Cursor
+- **Customizable Messages**: Send personalized notifications
 
 ## Installation
-Setup BrowserTools MCP Tool:
+
+Setup as a BrowserTools MCP Tool:
+
 1. Go to your 'Cursor Settings'
-2. Go to Features, scroll down to MCP Servers and click on 'Add new MCP server'
-![MCP Server Setup](/docs/guide.jpg)
+2. Navigate to Features, scroll down to MCP Servers and click on 'Add new MCP server'
+   ![MCP Server Setup](/docs/guide.jpg)
 
-3. Give it a unique name (mcp-server-notifier), set type to 'command' and set command to:
+3. Configure the server:
+   - Name: `mcp-server-notifier` (or any unique name)
+   - Type: `command`
+   - Command: `env WEBHOOK_URL=[YOUR WEBHOOK URL] WEBHOOK_TYPE=[PROVIDER] npx -y mcp-server-notifier`
 
-`env FEISHU_WEBHOOK_URL=[YOUR WEBHOOK URL] npx -y mcp-server-notifier`
+   See the [Configuration](#configuration) section for more details on available webhook types.
 
 ## Usage
 
-- tell agent to notify you a custom message when task is done
-- config it as a rule in cursor rules without duplicating it everytime (recommand)
+- Ask your AI agent to notify you with a custom message when a task is complete
+- Configure it as a persistent rule in Cursor settings to avoid repeating the setup
+
+## Configuration
+
+By default, the notifier supports several webhook types. You can specify the webhook type and URL through environment variables:
+
+```bash
+env WEBHOOK_URL="https://your-webhook-url" WEBHOOK_TYPE="discord" npx -y mcp-server-notifier
+```
+
+For more advanced configuration, see the [Advanced Configuration](#advanced-configuration) section.
+
+## Internationalization
+
+[简体中文文档](./docs/README_zh.md)
