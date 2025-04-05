@@ -26,7 +26,7 @@ All supported environment variables:
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `WEBHOOK_URL` | The URL of your webhook | Yes |
-| `WEBHOOK_TYPE` | Type of webhook (`discord`, `slack`, `teams`, `feishu`, `generic`, `custom`) | No (defaults to `generic`) |
+| `WEBHOOK_TYPE` | Type of webhook (`discord`, `slack`, `teams`, `feishu`, `ntfy`, `generic`, `custom`) | No (defaults to `generic`) |
 | `FEISHU_WEBHOOK_URL` | Legacy support for Feishu webhook URL | No |
 | `IMGUR_CLIENT_ID` | Imgur API client ID for image uploads | No |
 | `IMGUR_API_URL` | Custom Imgur API URL (if needed) | No |
@@ -90,6 +90,17 @@ You can create a `webhook-config.json` file in your current directory or in `~/.
   "webhook": {
     "type": "feishu",
     "url": "https://open.feishu.cn/open-apis/bot/v2/hook/your-webhook-url"
+  }
+}
+```
+
+### Ntfy
+
+```json
+{
+  "webhook": {
+    "type": "ntfy",
+    "url": "https://ntfy.sh/your-topic-name"
   }
 }
 ```

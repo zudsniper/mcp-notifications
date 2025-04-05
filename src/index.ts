@@ -34,10 +34,11 @@ server.tool(
   "notify-feishu",
   { message: z.string() },
   async ({ message }) => {
-    const response = await fetch(config.webhook.url, {
-      method: 'POST',
-      headers: webhookFormatter.formatHeaders(),
-      body: JSON.stringify(webhookFormatter.formatMessage({ body: message }))
+    const request = webhookFormatter.prepareRequest({ body: message });
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body
     });
     const data = await response.text();
     return {
@@ -74,11 +75,12 @@ server.tool(
       imageUrl: finalImageUrl
     };
 
-    // Send webhook
-    const response = await fetch(config.webhook.url, {
-      method: 'POST',
-      headers: webhookFormatter.formatHeaders(),
-      body: JSON.stringify(webhookFormatter.formatMessage(notificationMessage))
+    // Send webhook using the formatter's prepareRequest method
+    const request = webhookFormatter.prepareRequest(notificationMessage);
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body
     });
 
     const data = await response.text();

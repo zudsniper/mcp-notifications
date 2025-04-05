@@ -6,6 +6,12 @@ import { NotificationMessage, WebhookConfig } from '../config/types.js';
 export interface WebhookFormatter {
   formatMessage(message: NotificationMessage): any;
   formatHeaders(): Record<string, string>;
+  prepareRequest?(message: NotificationMessage): {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    body: any;
+  };
 }
 
 /**
@@ -30,6 +36,24 @@ export abstract class BaseWebhookFormatter implements WebhookFormatter {
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
+    };
+  }
+
+  /**
+   * Prepare the request configuration for sending
+   * Default implementation for JSON-based webhooks
+   */
+  prepareRequest(message: NotificationMessage): {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    body: any;
+  } {
+    return {
+      url: this.config.url,
+      method: 'POST',
+      headers: this.formatHeaders(),
+      body: JSON.stringify(this.formatMessage(message))
     };
   }
 }

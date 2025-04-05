@@ -27,6 +27,7 @@ export enum WebhookType {
   DISCORD = 'discord',
   SLACK = 'slack',
   TEAMS = 'teams',
+  NTFY = 'ntfy',
   GENERIC = 'generic',
   CUSTOM = 'custom'
 }

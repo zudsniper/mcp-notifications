@@ -2,6 +2,7 @@ import { WebhookConfig, WebhookType } from '../config/types.js';
 import { BaseWebhookFormatter, GenericWebhookFormatter } from './base.js';
 import { DiscordWebhookFormatter } from './discord.js';
 import { FeishuWebhookFormatter } from './feishu.js';
+import { NtfyWebhookFormatter } from './ntfy.js';
 import { SlackWebhookFormatter } from './slack.js';
 import { TeamsWebhookFormatter } from './teams.js';
 
@@ -22,6 +23,8 @@ export class WebhookFormatterFactory {
         return new SlackWebhookFormatter(config);
       case WebhookType.TEAMS:
         return new TeamsWebhookFormatter(config);
+      case WebhookType.NTFY:
+        return new NtfyWebhookFormatter(config);
       case WebhookType.GENERIC:
       case WebhookType.CUSTOM:
       default:
