@@ -3,7 +3,7 @@
   "bin": {
     "mcp-notifications": "./build/index.js"
   },
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "Lightweight Node.js server for sending webhook notifications. Supports Discord, Slack, Teams, Feishu, and custom webhooks. Ideal for AI-assisted developers working across multiple projects.",
   "main": "build/index.js",
   "authors": [

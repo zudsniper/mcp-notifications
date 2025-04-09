@@ -64,6 +64,10 @@ function loadFromEnv(defaultConfig: Config): Config {
     if (process.env.NTFY_TOKEN) {
       config.webhook.token = process.env.NTFY_TOKEN;
     }
+    // Support optional Bearer token via WEBHOOK_TOKEN (overrides NTFY_TOKEN if set)
+    if (process.env.WEBHOOK_TOKEN) {
+      config.webhook.token = process.env.WEBHOOK_TOKEN;
+    }
     if (process.env.NTFY_DEFAULT_PRIORITY) {
       const priority = parseInt(process.env.NTFY_DEFAULT_PRIORITY, 10);
       if (!isNaN(priority)) {
