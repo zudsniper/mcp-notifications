@@ -53,8 +53,8 @@ The AI agent can then call:
 ```
 await run("notify", { 
   title: "Chart Generated", 
-  message: "Here's the performance chart you requested.", 
-  imageUrl: "https://url-to-generated-image.png"
+  message: "Here's the performance chart you requested.",
+  imageUrl: "https://url-to-generated-image.png" // Use imageUrl when the image is already hosted online
 });
 ```
 
@@ -71,8 +71,8 @@ The AI agent can then call:
 ```
 await run("notify", { 
   title: "Current View", 
-  message: "Here's a screenshot of the current application state.", 
-  image: "/path/to/screenshot.png"
+  message: "Here's a screenshot of the current application state.",
+  image: "/path/to/screenshot.png" // Use image when the image is a local file that needs uploading
 });
 ```
 
@@ -88,7 +88,7 @@ await run("notify", {
   title: "Server Alert",
   priority: 5, // Set ntfy priority (1=min, 5=max)
   attachments: [
-    "https://example.com/disk_usage_chart.png"
+    "https://example.com/disk_usage_chart.png" // Use attachments for additional files or links beyond the main image
   ],
   actions: [
     {
@@ -124,16 +124,19 @@ When task is complete, notify me using the MCP Server Notifier with a summary of
 
 ## Imgur Image Support
 
-The `notify` tool supports two ways to include images:
+The `notify` tool supports two ways to include a **main image**:
 
-1. `imageUrl`: For images already available via a URL
-2. `image`: For local image files on your system
+1. `imageUrl`: Use this when the image is **already hosted online** and accessible via a direct URL. The notification will embed or display this image without uploading it.
+2. `image`: Use this when the image is a **local file on your system**. The system will upload this image (e.g., to Imgur or ntfy) before including it in the notification.
 
-When providing either option, the image will be:
-1. Uploaded to Imgur (if configured)
-2. The Imgur URL will be included in the webhook notification
+Additionally, you can provide:
+- `attachments`: A list of URLs (images, documents, files) to attach **beyond the main image**. These may be displayed as links or previews, depending on the service.
+
+When providing either `image` or `imageUrl`, the image may be:
+- Uploaded to Imgur (if configured)
+- The resulting URL included in the webhook notification
 
 This is useful for:
-- Sharing generated charts/diagrams
+- Sharing generated charts or diagrams
 - Sharing screenshots
 - Ensuring images remain accessible after temporary files are cleaned up

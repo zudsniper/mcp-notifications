@@ -2,6 +2,13 @@ import { NotificationMessage, NotificationAction } from '../config/types.js';
 import { BaseWebhookFormatter } from './base.js';
 import { getTemplate, hasTemplate } from '../templates/notification.js';
 
+import fsModule from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import urlModule from 'url';
+
+const fs = fsModule.promises;
 /**
  * Formatter for ntfy webhooks
  * 
@@ -27,7 +34,7 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
         // Use original message as a fallback if template fails
         return message.body;
       }
-    } 
+    }
     // Fallback to custom template if defined in config
     else if (this.config.templates?.message) {
       body = this.applyTemplate(this.config.templates.message, message);
@@ -50,8 +57,7 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
   }
 
   /**
-   * The ntfy service uses HTTP headers for metadata
-   * Override the send method to handle this
+   * Legacy synchronous prepareRequest for backward compatibility
    */
   prepareRequest(message: NotificationMessage): {
     url: string;
@@ -71,40 +77,11 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
       headers['Authorization'] = `Bearer ${config.token}`;
     }
 
-    // Handle templating
-    if (this.useTemplate) {
-      // Enable Go templating
-      headers['X-Template'] = 'yes';
-      
-      // Set title template if we have one
-      if (this.templatedTitle) {
-        headers['Title'] = this.templatedTitle;
-      } else if (message.title) {
-        headers['Title'] = message.title;
-      }
-      
-      // The body is the JSON payload with the template data
-      const templateData = message.templateData || {
-        // Default template data from the message
-        title: message.title,
-        body: message.body
-      };
-      
-      return {
-        url: config.url,
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(templateData)
-      };
-    }
-    
-    // Regular (non-template) handling continues here
-    
     // Templates for Title
     if (config.templates?.title) {
-      headers['Title'] = this.applyTemplate(config.templates.title, message);
+      headers['Title'] = this.sanitizeTitle(this.applyTemplate(config.templates.title, message));
     } else if (message.title) {
-      headers['Title'] = message.title;
+      headers['Title'] = this.sanitizeTitle(message.title);
     }
 
     // Click action (uses message.link)
@@ -115,8 +92,6 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     // Attachments (uses message.attachments or message.imageUrl)
     const attachments = message.attachments ?? (message.imageUrl ? [message.imageUrl] : []);
     if (attachments.length > 0) {
-      // Ntfy expects comma-separated URLs for the Attach header according to some examples, 
-      // even though docs mention multiple headers. Using comma-separated for compatibility.
       headers['Attach'] = attachments.join(', ');
     }
     
@@ -128,11 +103,8 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     if (allActions.length > 0) {
       headers['Actions'] = allActions
         .map(a => this.formatAction(a))
-        .join('; '); // Actions are separated by semicolons
+        .join('; ');
     }
-    
-    // Additional headers could be added here for other ntfy features
-    // like tags, icons, email, call, etc.
 
     return {
       url: config.url,
@@ -140,6 +112,140 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
       headers: headers,
       body: this.formatMessage(message)
     };
+  }
+
+  /**
+   * New async method to prepare upload + notification requests
+   */
+  async prepareRequests(message: NotificationMessage): Promise<Array<{
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    body: any;
+  }>> {
+    const config = this.config;
+    const requests = [];
+
+    function isLocalFile(filePath: string): boolean {
+      try {
+        return Boolean(filePath) && fsModule.existsSync(filePath) && fsModule.statSync(filePath).isFile();
+      } catch {
+        return false;
+      }
+    }
+
+    function getMimeType(filename: string): string {
+      const ext = path.extname(filename).toLowerCase();
+      switch (ext) {
+        case '.jpg':
+        case '.jpeg':
+          return 'image/jpeg';
+        case '.png':
+          return 'image/png';
+        case '.gif':
+          return 'image/gif';
+        case '.webp':
+          return 'image/webp';
+        default:
+          return 'application/octet-stream';
+      }
+    }
+
+    let attachmentUrls: string[] = message.attachments ? [...message.attachments] : [];
+
+    const filePath = message.imageUrl; // support imageUrl for backward compatibility
+    if (filePath && isLocalFile(filePath)) {
+      try {
+        const stat = fsModule.statSync(filePath);
+        const maxSize = 15 * 1024 * 1024;
+        if (stat.size <= maxSize) {
+          const topicUrl = config.url;
+          const parsedUrl = new URL(topicUrl);
+          const topic = parsedUrl.pathname.replace(/^\//, '');
+          const filename = path.basename(filePath);
+
+          const fileBuffer = fsModule.readFileSync(filePath);
+          const mimeType = getMimeType(filename);
+
+          // Build PUT URL with metadata as query parameters
+          const putUrl = new URL(`${parsedUrl.origin}/${topic}`);
+          if (message.title) putUrl.searchParams.append('title', message.title);
+          if (message.body) {
+            putUrl.searchParams.append('message', message.body);
+          }
+          const priorityVal = message.priority ?? config.defaultPriority ?? 3;
+          putUrl.searchParams.append('priority', String(Math.max(1, Math.min(5, priorityVal))));
+          putUrl.searchParams.append('filename', filename);
+          putUrl.searchParams.append('markdown', 'true');
+
+          const uploadHeaders: Record<string, string> = {
+            'Content-Type': mimeType
+          };
+          if (config.token) {
+            uploadHeaders['Authorization'] = `Bearer ${config.token}`;
+          }
+
+          requests.push({
+            url: putUrl.toString(),
+            method: 'PUT',
+            headers: uploadHeaders,
+            body: fileBuffer
+          });
+
+          // Skip adding POST request later
+          return requests;
+        } else {
+          console.warn(`ntfy upload skipped: file size ${stat.size} exceeds 15MB`);
+        }
+      } catch (err) {
+        console.error('ntfy upload error:', err);
+      }
+    }
+
+    const headers = this.formatHeaders();
+
+    const priority = message.priority ?? config.defaultPriority ?? 3;
+    headers['Priority'] = String(Math.max(1, Math.min(5, priority)));
+
+    if (config.token) {
+      headers['Authorization'] = `Bearer ${config.token}`;
+    }
+
+    if (config.templates?.title) {
+      headers['Title'] = this.sanitizeTitle(this.applyTemplate(config.templates.title, message));
+    } else if (message.title) {
+      headers['Title'] = this.sanitizeTitle(message.title);
+    }
+
+    if (message.link) {
+      headers['Click'] = message.link;
+    }
+
+    if (attachmentUrls.length > 0) {
+      headers['Attach'] = attachmentUrls.join(', ');
+    }
+
+    const allActions = [
+      ...(config.defaultActions ?? []),
+      ...(message.actions ?? [])
+    ];
+    if (allActions.length > 0) {
+      headers['Actions'] = allActions
+        .map(a => this.formatAction(a))
+        .join('; ');
+    }
+
+    // Only add POST request if no image upload PUT was added
+    if (requests.length === 0) {
+      requests.push({
+        url: config.url,
+        method: 'POST',
+        headers: headers,
+        body: this.formatMessage(message)
+      });
+    }
+
+    return requests;
   }
 
   /**
@@ -167,16 +273,13 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     if (action.method) options.push(`method=${action.method}`);
     if (action.clear) options.push('clear=true');
     
-    // Headers need careful formatting: header:Key=Value
     if (action.headers) {
       options.push(...Object.entries(action.headers)
         .map(([k, v]) => `header:${k}=${this.quoteIfNecessary(v)}`));
     }
     
-    // Body needs URL encoding if it contains special chars
     if (action.body) options.push(`body=${this.quoteIfNecessary(action.body)}`);
     
-    // Join parts and options. Options are comma-separated.
     return [...parts, ...options].map(p => this.quoteIfNecessary(String(p))).join(', ');
   }
 
@@ -184,10 +287,17 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
    * Quote a string if it contains commas or semicolons
    */
   private quoteIfNecessary(value: string): string {
-      if (value.includes(',') || value.includes(';')) {
-          // Escape existing quotes and wrap in double quotes
-          return `"${value.replace(/"/g, '\\"')}"`;
-      }
-      return value;
+    if (value.includes(',') || value.includes(';')) {
+      return `"${value.replace(/"/g, '\\"')}"`;
+    }
+    return value;
+  }
+
+  /**
+   * Sanitize title by removing emojis and non-ASCII characters
+   */
+  private sanitizeTitle(title: string | undefined | null): string {
+    if (!title) return '';
+    return title.replace(/[^\x00-\x7F]/g, '');
   }
 }

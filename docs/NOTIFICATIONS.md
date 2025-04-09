@@ -19,9 +19,9 @@ interface NotificationMessage {
   title?: string;                   // Optional notification title
   body: string;                     // Main content of the notification
   link?: string;                    // Optional URL to include
-  imageUrl?: string;                // Optional image URL
+  imageUrl?: string;                // URL of an image already hosted online; embedded directly without uploading
   priority?: number;                // Priority level (1-5, with 5 being highest)
-  attachments?: string[];           // URLs to attach to the notification
+  attachments?: string[];           // List of URLs (images, documents, files) to attach beyond the main image
   actions?: NotificationAction[];   // Interactive actions for the notification
   template?: string;                // Name of the predefined template to use
   templateData?: Record<string, any>; // Data to be used with the template
