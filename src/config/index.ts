@@ -49,21 +49,40 @@ export function loadConfig(): Config {
 function loadFromEnv(defaultConfig: Config): Config {
   const config = { ...defaultConfig };
   
-  // Support for legacy FEISHU_WEBHOOK_URL
-  if (process.env.FEISHU_WEBHOOK_URL) {
-    config.webhook = {
-      type: WebhookType.FEISHU,
-      url: process.env.FEISHU_WEBHOOK_URL,
-    };
-    return config;
-  }
-
   // Support for new WEBHOOK_URL and WEBHOOK_TYPE
   if (process.env.WEBHOOK_URL) {
     config.webhook = {
+      // Casting because WebhookConfig now has optional ntfy fields
+      ...(config.webhook as any), 
       type: (process.env.WEBHOOK_TYPE as WebhookType) || WebhookType.GENERIC,
       url: process.env.WEBHOOK_URL,
     };
+  }
+
+  // If the webhook type is ntfy, load ntfy-specific variables
+  if (config.webhook.type === WebhookType.NTFY) {
+    if (process.env.NTFY_TOKEN) {
+      config.webhook.token = process.env.NTFY_TOKEN;
+    }
+    if (process.env.NTFY_DEFAULT_PRIORITY) {
+      const priority = parseInt(process.env.NTFY_DEFAULT_PRIORITY, 10);
+      if (!isNaN(priority)) {
+        config.webhook.defaultPriority = priority;
+      }
+    }
+    if (process.env.NTFY_TEMPLATE_TITLE) {
+      config.webhook.templates = {
+        ...(config.webhook.templates || {}),
+        title: process.env.NTFY_TEMPLATE_TITLE
+      };
+    }
+    if (process.env.NTFY_TEMPLATE_MESSAGE) {
+      config.webhook.templates = {
+        ...(config.webhook.templates || {}),
+        message: process.env.NTFY_TEMPLATE_MESSAGE
+      };
+    }
+    // Note: Default actions from ENV is too complex, skipped for now.
   }
 
   // Imgur configuration
@@ -93,12 +112,30 @@ function mergeWithEnvVars(fileConfig: Config): Config {
     config.webhook.type = process.env.WEBHOOK_TYPE as WebhookType;
   }
 
-  // Support for legacy FEISHU_WEBHOOK_URL
-  if (process.env.FEISHU_WEBHOOK_URL) {
-    config.webhook = {
-      type: WebhookType.FEISHU,
-      url: process.env.FEISHU_WEBHOOK_URL,
-    };
+  // Override ntfy specific config from environment if provided
+  if (config.webhook.type === WebhookType.NTFY) {
+     if (process.env.NTFY_TOKEN) {
+      config.webhook.token = process.env.NTFY_TOKEN;
+    }
+    if (process.env.NTFY_DEFAULT_PRIORITY) {
+      const priority = parseInt(process.env.NTFY_DEFAULT_PRIORITY, 10);
+      if (!isNaN(priority)) {
+        config.webhook.defaultPriority = priority;
+      }
+    }
+    if (process.env.NTFY_TEMPLATE_TITLE) {
+      config.webhook.templates = {
+        ...(config.webhook.templates || {}),
+        title: process.env.NTFY_TEMPLATE_TITLE
+      };
+    }
+    if (process.env.NTFY_TEMPLATE_MESSAGE) {
+      config.webhook.templates = {
+        ...(config.webhook.templates || {}),
+        message: process.env.NTFY_TEMPLATE_MESSAGE
+      };
+    }
+    // Note: Default actions from ENV is too complex, skipped for now.
   }
 
   // Override Imgur config from environment if provided

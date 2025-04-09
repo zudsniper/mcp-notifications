@@ -4,10 +4,9 @@ MCP Server Notifier provides MCP tools for sending notifications to various webh
 
 ## Available Tools
 
-The notifier provides two main tools:
+The notifier provides one main tool:
 
-1. `notify-feishu` - Legacy tool for backward compatibility
-2. `notify` - New tool with enhanced capabilities
+1. `notify` - Flexible notification tool with support for text, links, and images
 
 ## Basic Usage
 
@@ -41,7 +40,7 @@ await run("notify", {
 });
 ```
 
-### With Images
+### With Remote Images
 
 If you've configured Imgur support:
 
@@ -59,6 +58,58 @@ await run("notify", {
 });
 ```
 
+### With Local Image Files
+
+You can now directly upload local image files:
+
+```
+Please notify me with a screenshot of the current view.
+```
+
+The AI agent can then call:
+
+```
+await run("notify", { 
+  title: "Current View", 
+  message: "Here's a screenshot of the current application state.", 
+  image: "/path/to/screenshot.png"
+});
+```
+
+The image file will be automatically read, uploaded to Imgur, and included in the notification.
+
+### Advanced Ntfy Features
+
+When using the `ntfy` provider, you can leverage additional features:
+
+```javascript
+await run("notify", {
+  message: "Disk usage is high!",
+  title: "Server Alert",
+  priority: 5, // Set ntfy priority (1=min, 5=max)
+  attachments: [
+    "https://example.com/disk_usage_chart.png"
+  ],
+  actions: [
+    {
+      action: "view", // Add a 'view' action button
+      label: "Open Grafana",
+      url: "https://grafana.example.com/d/abcdefg"
+    },
+    {
+      action: "http", // Add an 'http' action button
+      label: "Clear Cache",
+      url: "https://api.example.com/clear-cache",
+      method: "POST",
+      headers: {"X-API-Key": "secret-key"},
+      clear: true // Clear notification after action
+    }
+  ]
+});
+```
+
+This allows setting message priority, attaching files by URL, and adding custom action buttons to the notification.
+
 ## Setting up as a Cursor Rule
 
 For consistent usage, you can configure this as a rule in Cursor:
@@ -73,8 +124,12 @@ When task is complete, notify me using the MCP Server Notifier with a summary of
 
 ## Imgur Image Support
 
-When providing an `imageUrl` to the `notify` tool, the image will be:
+The `notify` tool supports two ways to include images:
 
+1. `imageUrl`: For images already available via a URL
+2. `image`: For local image files on your system
+
+When providing either option, the image will be:
 1. Uploaded to Imgur (if configured)
 2. The Imgur URL will be included in the webhook notification
 

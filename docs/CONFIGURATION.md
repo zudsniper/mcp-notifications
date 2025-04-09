@@ -27,7 +27,6 @@ All supported environment variables:
 |----------|-------------|----------|
 | `WEBHOOK_URL` | The URL of your webhook | Yes |
 | `WEBHOOK_TYPE` | Type of webhook (`discord`, `slack`, `teams`, `feishu`, `ntfy`, `generic`, `custom`) | No (defaults to `generic`) |
-| `FEISHU_WEBHOOK_URL` | Legacy support for Feishu webhook URL | No |
 | `IMGUR_CLIENT_ID` | Imgur API client ID for image uploads | No |
 | `IMGUR_API_URL` | Custom Imgur API URL (if needed) | No |
 
@@ -48,104 +47,38 @@ You can create a `webhook-config.json` file in your current directory or in `~/.
 }
 ```
 
-## Supported Webhook Types
+### Ntfy Advanced Configuration
 
-### Discord
-
-```json
-{
-  "webhook": {
-    "type": "discord",
-    "url": "https://discord.com/api/webhooks/your-webhook-url"
-  }
-}
-```
-
-### Slack
-
-```json
-{
-  "webhook": {
-    "type": "slack",
-    "url": "https://hooks.slack.com/services/your-webhook-url"
-  }
-}
-```
-
-### Microsoft Teams
-
-```json
-{
-  "webhook": {
-    "type": "teams",
-    "url": "https://outlook.office.com/webhook/your-webhook-url"
-  }
-}
-```
-
-### Feishu
-
-```json
-{
-  "webhook": {
-    "type": "feishu",
-    "url": "https://open.feishu.cn/open-apis/bot/v2/hook/your-webhook-url"
-  }
-}
-```
-
-### Ntfy
+When using the `ntfy` webhook type, you can specify additional configuration options:
 
 ```json
 {
   "webhook": {
     "type": "ntfy",
-    "url": "https://ntfy.sh/your-topic-name"
+    "url": "https://ntfy.sh/your-topic",
+    "token": "your-auth-token", // Optional: Bearer token for authentication
+    "defaultPriority": 4,       // Optional: Default priority (1-5)
+    "templates": {                // Optional: Templates for message formatting
+      "title": "[P{priority}] {title}",
+      "message": "{body}\n\nAttachments: {attachments}"
+    },
+    "defaultActions": [{          // Optional: Default actions
+      "action": "view",
+      "label": "Open Dashboard",
+      "url": "https://example.com"
+    }]
   }
 }
 ```
 
-### Generic
+You can also configure these via environment variables:
+- `NTFY_TOKEN`
+- `NTFY_DEFAULT_PRIORITY`
+- `NTFY_TEMPLATE_TITLE`
+- `NTFY_TEMPLATE_MESSAGE`
 
-The generic webhook type sends a simple JSON payload with title, text, URL, and imageUrl fields:
+## Supported Webhook Types
 
-```json
-{
-  "webhook": {
-    "type": "generic",
-    "url": "https://your-webhook-url"
-  }
-}
+### Discord
+
 ```
-
-### Custom
-
-For custom webhook formats, use the "custom" type. You'll need to customize the formatter implementation in the code.
-
-```json
-{
-  "webhook": {
-    "type": "custom",
-    "url": "https://your-custom-webhook"
-  }
-}
-```
-
-## Image Upload Configuration
-
-To enable image uploads to Imgur:
-
-```json
-{
-  "imgur": {
-    "clientId": "your-imgur-client-id"
-  }
-}
-```
-
-Without a client ID, anonymous uploads will be attempted but may be rate-limited.
-
-## Configuration Precedence
-
-1. Environment variables take precedence over JSON configuration files
-2. Current directory `webhook-config.json` takes precedence over home directory config

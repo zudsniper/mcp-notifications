@@ -3,13 +3,23 @@
   "bin": {
     "mcp-server-notifier": "./build/index.js"
   },
-  "version": "1.0.5",
+  "version": "2.2.0",
   "description": "Lightweight Node.js server for sending webhook notifications. Supports Discord, Slack, Teams, Feishu, and custom webhooks. Ideal for AI-assisted developers working across multiple projects.",
   "main": "build/index.js",
-  "author": "tuberrabbit@gmail.com",
+  "authors": [
+    {
+      "name": "tuberrabbit",
+      "email": "tuberrabbit@gmail.com"
+    },
+    {
+      "name": "Jason McElhenny",
+      "email": "me@zod.tf",
+      "url": "https://github.com/zudsniper"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tuberrabbit/mcp-server-notifier.git"
+    "url": "git+https://github.com/zudsniper/mcp-server-notifier.git"
   },
   "keywords": [
     "mcp",
@@ -32,11 +42,11 @@
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@modelcontextprotocol/sdk": "1.9.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^22.13.10",
-    "typescript": "^5.8.2"
+    "@types/node": "22.14.0",
+    "typescript": "5.8.3"
   }
 }

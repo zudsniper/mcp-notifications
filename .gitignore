@@ -130,3 +130,12 @@ dist
 .pnp.*
 
 .cursor
+
+build
+dist
+# cursor-tools
+.repomix*
+!.repomixignore
+cursor-tools.config.json
+
+.env

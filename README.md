@@ -50,13 +50,26 @@ npm run build
 ### Cursor Integration
 
 1. Go to your 'Cursor Settings'
-2. Navigate to Features, scroll down to MCP Servers and click on 'Add new MCP server'
-   ![MCP Server Setup](./docs/guide.jpg)
+2. Click `MCP` in the sidebar, then click `+ Add new global MCP server`
+3. Add `mcp-server-notifier`.  
+```json
+{
+   "mcpServers": {
+      "notifier": {
+         "command": "npx",
+         "args": [
+            "-y",
+            "mcp-server-notifier"
+         ],
+         "env": {
+            "WEBHOOK_URL": "https://ntfy.sh/webhook-url-example",
+            "WEBHOOK_TYPE": "ntfy"
+         }
+      }
+   }
+}
 
-3. Configure the server:
-   - Name: `mcp-server-notifier` (or any unique name)
-   - Type: `command`
-   - Command: `env WEBHOOK_URL=[YOUR WEBHOOK URL] WEBHOOK_TYPE=[PROVIDER] npx -y mcp-server-notifier`
+```
 
 ## Configuration
 
@@ -103,19 +116,78 @@ For detailed usage instructions, see the [Usage Guide](./docs/USAGE.md).
 
 ### Available Tools
 
-1. `notify-feishu` (Legacy)
-   - **Purpose**: Send simple text notifications via Feishu
-   - **Input**: `message` - Text to send
-   - **Best for**: Backward compatibility
-
-2. `notify`
+1. `notify`
    - **Purpose**: Send rich notifications to any configured webhook
    - **Input**: 
      - `message` - Text content of the notification
      - `title` (optional) - Title for the notification
-     - `link` (optional) - URL to include in the notification
-     - `imageUrl` (optional) - URL of an image to include (supports Imgur upload)
-   - **Best for**: All notification needs
+     - `link` (optional) - URL to include in the notification (used as click action for ntfy)
+     - `imageUrl` (optional) - URL of an image to include (legacy, use `image` or `attachments`)
+     - `image` (optional) - Local file path of an image to upload to Imgur
+     - `priority` (optional, ntfy only) - Notification priority (1-5)
+     - `attachments` (optional, ntfy only) - Array of URLs to attach
+     - `template` (optional, ntfy only) - Predefined template to use: status, question, progress, problem
+     - `templateData` (optional, ntfy only) - Data to populate the chosen template
+     - `actions` (optional, ntfy only) - Array of action button definitions (`view` or `http`)
+   - **Best for**: General notification needs
+
+> **Note:** Template functionality is currently under development and has limited support. Templates work best with ntfy.sh but may not be fully implemented for all webhook providers. See the ROADMAP.md file for future implementation plans.
+
+### NTFY Templates
+
+When using ntfy.sh as your webhook provider, you can use the following predefined templates:
+
+1. **Status Template** (`status`)
+   - **Purpose**: Send status updates about systems, processes, or tasks
+   - **Data Fields**:
+     - `status` - Current status (e.g., "online", "completed", "pending")
+     - `details` (optional) - Additional information about the status
+     - `timestamp` (optional) - When this status was recorded
+     - `component` (optional) - The system component this status applies to
+
+2. **Question Template** (`question`)
+   - **Purpose**: Ask questions that require a response
+   - **Data Fields**:
+     - `question` - The main question being asked
+     - `context` (optional) - Background information for the question
+     - `options` (optional) - Possible answer options
+     - `deadline` (optional) - When a response is needed by
+
+3. **Progress Template** (`progress`)
+   - **Purpose**: Track progress of long-running tasks
+   - **Data Fields**:
+     - `title` - Name of the task or process
+     - `current` - Current progress value
+     - `total` - Total value to reach completion
+     - `percentage` (optional) - Explicit percentage value (calculated if not provided)
+     - `eta` (optional) - Estimated time to completion
+     - `details` (optional) - Additional information about the progress
+
+4. **Problem Template** (`problem`)
+   - **Purpose**: Report errors or issues
+   - **Data Fields**:
+     - `title` - Short description of the problem
+     - `description` (optional) - Detailed information about the problem
+     - `severity` (optional) - How severe the problem is (e.g., "critical", "warning")
+     - `source` (optional) - Where the problem originated
+     - `timestamp` (optional) - When the problem occurred
+     - `solution` (optional) - Suggested ways to fix the problem
+
+**Example Using Template**:
+```javascript
+// Send a progress notification
+{
+  "template": "progress",
+  "templateData": {
+    "title": "Database Backup",
+    "current": 75,
+    "total": 100,
+    "eta": "2 minutes remaining",
+    "details": "Compressing backup files"
+  },
+  "priority": 3
+}
+```
 
 ## Docker Support
 
@@ -163,7 +235,7 @@ npm run build
 npm install -g @modelcontextprotocol/inspector
 
 # Start the server with the Inspector
-npx @modelcontextprotocol/inspector build/index.js
+npx @modelcontextprotocol/inspector node build/index.js
 ```
 
 2. The Inspector provides a web interface where you can:
