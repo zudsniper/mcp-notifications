@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: zudsniper/mcp-server-notifier
-  NPM_PACKAGE: mcp-server-notifier
+  DOCKER_IMAGE: zudsniper/mcp-notifications
+  NPM_PACKAGE: mcp-notifications
 
 jobs:
   version-check:
@@ -25,7 +25,7 @@ jobs:
       - name: Check if version exists on npm
         id: version-check
         run: |
-          response=$(curl -s https://registry.npmjs.org/mcp-server-notifier || echo '{"versions":{}}')
+          response=$(curl -s https://registry.npmjs.org/mcp-notifications || echo '{"versions":{}}')
           exists=$(echo $response | jq -r --arg v "${{ steps.extract-version.outputs.version }}" 'has("versions") and .versions | has($v)' 2>/dev/null || echo 'false')
           
           if [ "$exists" = "true" ]; then
@@ -53,37 +53,38 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-  build-and-push-docker:
-    needs: [test, version-check]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Set version from version-check job
-        id: version
-        run: echo "VERSION=${{ needs.version-check.outputs.version }}" >> $GITHUB_OUTPUT
-      
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ env.DOCKER_IMAGE }}:latest
-            ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.VERSION }}
+# Temporarily disabled Docker build and push
+#  build-and-push-docker:
+#    needs: [test, version-check]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v3
+#      
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#      
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#      
+#      - name: Set version from version-check job
+#        id: version
+#        run: echo "VERSION=${{ needs.version-check.outputs.version }}" >> $GITHUB_OUTPUT
+#      
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: .
+#          push: true
+#          platforms: linux/amd64,linux/arm64
+#          tags: |
+#            ${{ env.DOCKER_IMAGE }}:latest
+#            ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.VERSION }}
 
   publish-npm:
     needs: [test, version-check]
@@ -109,7 +110,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   create-release:
-    needs: [build-and-push-docker, publish-npm, version-check]
+    needs: [publish-npm, version-check] # Removed build-and-push-docker dependency
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
