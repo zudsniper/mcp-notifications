@@ -57,8 +57,6 @@ server.tool(
     image: z.string().optional().describe("Local file path for an image to upload to Imgur"),
     priority: z.number().int().min(1).max(5).optional().describe("Notification priority level from 1-5 (5=highest)"),
     attachments: z.array(z.string().url()).optional().describe("List of URLs to attach to the notification"),
-    template: templateEnum.optional().describe(`Use a predefined notification template: ${templateNames.join(", ") || "none available"}`),
-    templateData: z.record(z.any()).optional().describe("Data to use with the selected template"),
     actions: z.array(z.object({
       action: z.enum(['view', 'http']).describe("Type of action: 'view' opens URL, 'http' makes a request"),
       label: z.string().describe("Text label for the action button"),
@@ -77,8 +75,6 @@ server.tool(
     image, 
     priority, 
     attachments,
-    template,
-    templateData,
     actions 
   }) => {
     // Handle image upload to Imgur if provided and Imgur is configured
@@ -118,8 +114,6 @@ server.tool(
       imageUrl: finalImageUrl, 
       priority,
       attachments,
-      template,
-      templateData,
       actions
     };
 
