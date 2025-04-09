@@ -18,6 +18,12 @@ const __dirname = path.dirname(__filename);
 const packageJsonPath = path.join(__dirname, '..', 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
+// Check for --version flag
+if (process.argv.includes('--version') || process.argv.includes('-v')) {
+  console.log(packageJson.version);
+  process.exit(0);
+}
+
 // Load configuration
 const config = loadConfig();
 

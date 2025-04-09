@@ -43,7 +43,7 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
 
   formatHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'text/markdown',
       'X-Markdown': 'true',  // Enable Markdown formatting
     };
     return headers;
