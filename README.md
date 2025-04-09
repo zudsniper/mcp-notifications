@@ -87,6 +87,18 @@ You can specify the webhook type and URL through environment variables:
 ```bash
 env WEBHOOK_URL="https://your-webhook-url" WEBHOOK_TYPE="discord" npx -y mcp-server-notifier
 ```
+### Authentication Tokens
+
+`WEBHOOK_TOKEN` is an **optional** environment variable. When set, it will be included as a Bearer token in the `Authorization` header **only** for **ntfy** webhook requests. If `WEBHOOK_TOKEN` is not set, no Authorization header is sent.
+
+- **Basic Authentication is not supported.**
+- This token is **ignored** by all other webhook providers (Discord, Slack, Teams, Feishu, Generic JSON).
+
+**Example:**
+
+```bash
+env WEBHOOK_URL="https://ntfy.sh/your-topic" WEBHOOK_TYPE="ntfy" WEBHOOK_TOKEN="your-secret-token" npx -y mcp-server-notifier
+```
 
 ### Configuration File
 
