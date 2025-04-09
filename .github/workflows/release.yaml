@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: zudsniper/mcp-server-notifier
-  NPM_PACKAGE: mcp-server-notifier
+  DOCKER_IMAGE: zudsniper/mcp-notifier
+  NPM_PACKAGE: mcp-notifier
 
 jobs:
   version-check:
@@ -25,7 +25,7 @@ jobs:
       - name: Check if version exists on npm
         id: version-check
         run: |
-          response=$(curl -s https://registry.npmjs.org/mcp-server-notifier || echo '{"versions":{}}')
+          response=$(curl -s https://registry.npmjs.org/mcp-notifier || echo '{"versions":{}}')
           exists=$(echo $response | jq -r --arg v "${{ steps.extract-version.outputs.version }}" 'has("versions") and .versions | has($v)' 2>/dev/null || echo 'false')
           
           if [ "$exists" = "true" ]; then
