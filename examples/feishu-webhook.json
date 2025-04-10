@@ -1,0 +1,7 @@
+{
+  "webhook": {
+    "type": "feishu",
+    "url": "https://open.feishu.cn/open-apis/bot/v2/hook/your-feishu-webhook-url",
+    "name": "Feishu Task Notifier"
+  }
+}

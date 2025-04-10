@@ -1,0 +1,7 @@
+{
+  "webhook": {
+    "type": "slack",
+    "url": "https://hooks.slack.com/services/your-slack-webhook-url",
+    "name": "Slack Task Notifier"
+  }
+}

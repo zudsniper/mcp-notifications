@@ -1,0 +1,10 @@
+{
+  "webhook": {
+    "type": "ntfy",
+    "url": "https://ntfy.sh/your-topic-name",
+    "name": "Ntfy Task Notifier"
+  },
+  "imgur": {
+    "clientId": "your-imgur-client-id"
+  }
+}
