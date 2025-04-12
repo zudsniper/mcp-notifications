@@ -29,6 +29,9 @@ export interface WebhookConfig {
     message?: string;
   };
   defaultActions?: NotificationAction[];
+  // Discord specific options
+  username?: string; // Custom username for Discord webhook
+  avatarUrl?: string; // Custom avatar URL for Discord webhook
 }
 
 // Configuration for image upload

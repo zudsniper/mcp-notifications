@@ -18,6 +18,9 @@ Currently maintained by [zudsniper](https://github.com/zudsniper).
 - **Multi-Project Support**: Efficiently manage notifications across different projects
 - **Easy Integration**: Simple setup with AI tools like Cursor
 - **Customizable Messages**: Send personalized notifications with title, body, and links
+- **Discord Embed Support**: Send rich, customizable Discord embed notifications
+- **Discord Webhook Example**: Now includes a sample Discord webhook config (`discord_webhook.json`) and test script (`src/test-discord.js`)
+- **Improved Discord/NTFY Logic**: Enhanced webhook handling and configuration types
 
 ## Installation
 
@@ -219,6 +222,8 @@ docker run -e WEBHOOK_URL=https://your-webhook-url -e WEBHOOK_TYPE=discord zudsn
 
 Example webhook configurations are available in the [examples](./examples) directory.
 
+A new example for Discord webhook configuration is provided in `discord_webhook.json` at the project root.
+
 ## Development
 
 ### Setting Up Development Environment
@@ -238,6 +243,8 @@ npm install
 ```bash
 npm run build
 ```
+
+- Node version management is now supported via `.nvmrc` for consistent development environments.
 
 ### Testing Your Changes
 

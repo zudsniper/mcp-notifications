@@ -63,6 +63,8 @@ server.tool(
     image: z.string().optional().describe("Local file path for an image to upload to Imgur"),
     priority: z.number().int().min(1).max(5).optional().describe("Notification priority level from 1-5 (5=highest)"),
     attachments: z.array(z.string().url()).optional().describe("List of URLs to attach to the notification"),
+    template: templateEnum.describe("Predefined template to use (e.g., 'status', 'question', 'progress', 'problem')"),
+    templateData: z.record(z.any()).optional().describe("Data to be used with the selected template"),
     actions: z.array(z.object({
       action: z.enum(['view', 'http']).describe("Type of action: 'view' opens URL, 'http' makes a request"),
       label: z.string().describe("Text label for the action button"),
@@ -81,7 +83,9 @@ server.tool(
     image, 
     priority, 
     attachments,
-    actions 
+    actions,
+    template,
+    templateData
   }) => {
     // Handle image upload to Imgur if provided and Imgur is configured
     let finalImageUrl = imageUrl; // Use legacy imageUrl if provided
@@ -112,6 +116,9 @@ server.tool(
       }
     }
 
+    // Default to 'status' template if template is requested but not specified
+    const finalTemplate = template === undefined && templateData ? 'status' : template;
+
     // Construct the notification message object
     const notificationMessage: NotificationMessage = {
       title,
@@ -120,7 +127,9 @@ server.tool(
       imageUrl: finalImageUrl, 
       priority,
       attachments,
-      actions
+      actions,
+      template: finalTemplate,
+      templateData
     };
 
     // Send webhook using the formatter's prepareRequest method
