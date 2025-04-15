@@ -40,10 +40,18 @@ export interface ImgurConfig {
   apiUrl?: string;    // Override API URL if needed
 }
 
+// Configuration for ask functionality
+export interface AskConfig {
+  enabled: boolean;
+  serverUrl: string;
+  port: number;
+}
+
 // Main configuration interface
 export interface Config {
   webhook: WebhookConfig;
   imgur?: ImgurConfig;
+  ask?: AskConfig;
 }
 
 // Supported webhook types

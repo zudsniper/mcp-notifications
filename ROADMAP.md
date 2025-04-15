@@ -4,6 +4,7 @@
 - Basic templates are implemented in a provider-agnostic way
 - Templates are currently defined statically in code
 - Provider-specific templating is not fully implemented
+- Simple ask functionality implemented through a web UI
 
 ## Future Implementation Plan
 
@@ -34,6 +35,14 @@
 - Add conditional rendering logic
 - Support for template localization
 - Template preview functionality
+
+### Phase 5: Enhanced Ask Functionality
+- Implement persistent storage for questions and answers
+- Add user authentication for the ask interface
+- Support for rich responses including markdown and attachments
+- Create a chat history view for previous Q&A sessions
+- Add support for real-time notifications when questions are answered
+- Improve UI/UX of the ask interface
 
 ## Implementation Details
 Each webhook provider will implement a `applyTemplate` method that:

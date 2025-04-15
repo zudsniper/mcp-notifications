@@ -11,6 +11,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { listTemplateNames } from './templates/notification.js';
+import { startServer, askQuestion, getQuestionUrl } from './server/ask/index.js';
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url);
@@ -81,6 +82,70 @@ const templateNames = listTemplateNames();
 const templateEnum = templateNames.length > 0 
   ? z.union([z.enum(templateNames as [string, ...string[]]), z.undefined()])
   : z.undefined();
+
+// Start the ask server if enabled
+if (config.ask?.enabled) {
+  startServer(config.ask.port)
+    .then(() => console.log(`Ask server started on port ${config.ask!.port}`))
+    .catch(error => console.error('Failed to start ask server:', error));
+}
+
+// Ask question tool
+if (config.ask?.enabled) {
+  server.tool(
+    "ask_question",
+    "Ask a question via a web UI and wait for an answer with a timeout",
+    {
+      question: z.string().describe("The question to ask"),
+      title: z.string().optional().describe("Optional title for the question"),
+      timeout: z.number().int().min(10).max(3600).describe("Timeout in seconds (10-3600)")
+    },
+    async ({ question, title, timeout }) => {
+      try {
+        // Start asking the question
+        console.log(`Asking question: ${title || 'Untitled'}`);
+        
+        // Generate a question and get the promise for the answer
+        const { questionId, answerPromise } = askQuestion(question, title, timeout);
+        
+        // Generate the URL for the question
+        const questionUrl = getQuestionUrl(questionId, config.ask!.serverUrl, config.ask!.port);
+        
+        console.log(`Question URL: ${questionUrl}`);
+        
+        // Send notification about the new question
+        if (config.webhook?.url) {
+          const notificationMessage: NotificationMessage = {
+            title: `Question: ${title || 'Untitled'}`,
+            body: `New question: ${question}\n\nReply at: ${questionUrl}`,
+            link: questionUrl,
+            template: 'question'
+          };
+          
+          // Send the notification asynchronously - don't await
+          sendNotification(notificationMessage)
+            .catch(error => console.error('Failed to send question notification:', error));
+        }
+        
+        // Wait for an answer with timeout
+        const answer = await answerPromise;
+        
+        console.log(`Answer received for: ${title || 'Untitled'}`);
+        
+        return {
+          content: [
+            { type: "text", text: `Answer received: ${answer}` }
+          ]
+        };
+      } catch (error: any) {
+        console.error('Error in ask_question:', error);
+        return {
+          content: [{ type: "text", text: `Failed to get an answer: ${error.message}` }]
+        };
+      }
+    }
+  );
+}
 
 // Simplified notification tool
 server.tool(

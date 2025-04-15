@@ -97,6 +97,16 @@ function loadFromEnv(defaultConfig: Config): Config {
     };
   }
 
+  // Ask functionality configuration
+  const askEnabled = process.env.ASKING === 'true';
+  if (askEnabled) {
+    config.ask = {
+      enabled: true,
+      serverUrl: process.env.ASK_SERVER_URL || 'http://localhost',
+      port: parseInt(process.env.ASK_SERVER_PORT || '4591', 10)
+    };
+  }
+
   return config;
 }
 
@@ -153,6 +163,16 @@ function mergeWithEnvVars(fileConfig: Config): Config {
   
   if (process.env.IMGUR_API_URL) {
     config.imgur.apiUrl = process.env.IMGUR_API_URL;
+  }
+
+  // Override Ask config from environment if provided
+  const askEnabled = process.env.ASKING === 'true';
+  if (askEnabled) {
+    config.ask = {
+      enabled: true,
+      serverUrl: process.env.ASK_SERVER_URL || (config.ask?.serverUrl || 'http://localhost'),
+      port: parseInt(process.env.ASK_SERVER_PORT || (config.ask?.port?.toString() || '4591'), 10)
+    };
   }
 
   return config;

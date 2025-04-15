@@ -39,10 +39,20 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
+    "test:ask": "tsc && node build/test-ask.js",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.9.0",
+    "@types/express": "^5.0.1",
+    "@types/react": "^19.1.1",
+    "@types/react-dom": "^19.1.2",
+    "@types/uuid": "^10.0.0",
+    "express": "^5.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "uuid": "^11.1.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

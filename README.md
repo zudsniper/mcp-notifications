@@ -19,6 +19,7 @@ Currently maintained by [zudsniper](https://github.com/zudsniper).
 - **Easy Integration**: Simple setup with AI tools like Cursor
 - **Customizable Messages**: Send personalized notifications with title, body, and links
 - **Discord Embed Support**: Send rich, customizable Discord embed notifications
+- **Interactive Question System**: Ask questions and receive answers through a web interface
 - **Discord Webhook Example**: Now includes a sample Discord webhook config (`discord_webhook.json`) and test script (`src/test-discord.js`)
 - **Improved Discord/NTFY Logic**: Enhanced webhook handling and configuration types
 
@@ -122,6 +123,23 @@ For more advanced configuration, you can create a `webhook-config.json` file:
 
 See the [Configuration Guide](./docs/CONFIGURATION.md) for full details and examples.
 
+### Ask Functionality Configuration (Optional)
+
+To enable the interactive question system, add the following to your environment variables:
+
+```bash
+# Enable the ask functionality
+ASKING=true
+
+# Configure the server URL (without trailing slash)
+ASK_SERVER_URL=http://localhost
+
+# Configure the server port
+ASK_SERVER_PORT=3000
+```
+
+When enabled, this starts a small web server that allows you to ask questions and receive answers through a web interface.
+
 ## Usage
 
 - Ask your AI agent to notify you with a custom message when a task is complete
@@ -147,6 +165,15 @@ For detailed usage instructions, see the [Usage Guide](./docs/USAGE.md).
    - **Best for**: General notification needs
 
 > **Note:** Template functionality is currently under development and has limited support. Templates work best with ntfy.sh but may not be fully implemented for all webhook providers. See the ROADMAP.md file for future implementation plans.
+
+2. `ask_question` (Requires ASKING=true)
+   - **Purpose**: Ask a question and wait for an answer through a web interface
+   - **Input**: 
+     - `question` - The question to ask
+     - `title` (optional) - Title for the question
+     - `timeout` - Maximum time to wait for an answer in seconds (10-3600)
+   - **Output**: The answer received or an error if timed out
+   - **Best for**: Getting user input during AI workflows
 
 ### NTFY Templates
 
