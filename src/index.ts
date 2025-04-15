@@ -45,22 +45,77 @@ const server = new McpServer({
   version: packageJson.version
 });
 
+// Helper function to send the notification
+async function sendNotification(notificationMessage: NotificationMessage): Promise<{ content: { type: "text"; text: string }[] }> {
+  const request = webhookFormatter.prepareRequest(notificationMessage);
+  let response: Response;
+  try {
+    response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body
+    });
+  } catch (error: any) {
+    console.error("Failed to send notification:", error);
+    return {
+      content: [{ type: "text", text: `Failed to send notification: Network error - ${error.message}` }]
+    };
+  }
+
+  const data = await response.text();
+
+  if (response.ok) {
+    return {
+      content: [{ type: "text", text: `Notification sent successfully (Status: ${response.status}). Response: ${data}` }]
+    };
+  } else {
+    console.error(`Failed to send notification (Status: ${response.status}): ${data}`);
+    return {
+      content: [{ type: "text", text: `Failed to send notification (Status: ${response.status}). Response: ${data}` }]
+    };
+  }
+}
+
 // Get list of template names
 const templateNames = listTemplateNames();
 const templateEnum = templateNames.length > 0 
   ? z.union([z.enum(templateNames as [string, ...string[]]), z.undefined()])
   : z.undefined();
 
-// Provider-agnostic notification tool
+// Simplified notification tool
 server.tool(
   "notify",
-  "Send a notification to configured webhook services (Discord, Slack, Teams, Feishu, ntfy, custom)",
+  "Send a simple notification with body, optional title, and optional template (e.g., 'status', 'question', 'progress', 'problem')",
   {
-    message: z.string().describe("The main content of the notification message"),
+    body: z.string().describe("The main content of the notification message"),
+    title: z.string().optional().describe("Optional title for the notification"),
+    template: templateEnum.describe("Optional predefined template to use (e.g., 'status', 'question', 'progress', 'problem')"),
+  },
+  async ({ body, title, template }) => {
+    // Default to 'status' template if template is requested but not specified
+    // Note: If templateData existed here, we might default, but it doesn't.
+    const finalTemplate = template === undefined ? 'status' : template;
+
+    const notificationMessage: NotificationMessage = {
+      title,
+      body,
+      template: finalTemplate,
+    };
+
+    return sendNotification(notificationMessage);
+  }
+);
+
+// Full-featured notification tool
+server.tool(
+  "full_notify",
+  "Send a detailed notification with advanced options (link, image, priority, attachments, actions, template data)",
+  {
+    body: z.string().describe("The main content of the notification message"), // Renamed from message
     title: z.string().optional().describe("Optional title for the notification"),
     link: z.string().url().optional().describe("Optional URL to include in the notification"),
-    imageUrl: z.string().url().optional().describe("URL of an image to include (will be used as an attachment when possible)"),
-    image: z.string().optional().describe("Local file path for an image to upload to Imgur"),
+    imageUrl: z.string().url().optional().describe("URL of an image to include (will be uploaded to Imgur if configured)"),
+    image: z.string().optional().describe("Local file path for an image to upload to Imgur (prioritized over imageUrl)"),
     priority: z.number().int().min(1).max(5).optional().describe("Notification priority level from 1-5 (5=highest)"),
     attachments: z.array(z.string().url()).optional().describe("List of URLs to attach to the notification"),
     template: templateEnum.describe("Predefined template to use (e.g., 'status', 'question', 'progress', 'problem')"),
@@ -75,13 +130,13 @@ server.tool(
       clear: z.boolean().optional().describe("Whether to clear notification after action")
     })).optional().describe("Interactive action buttons for the notification")
   },
-  async ({ 
-    message, 
-    title, 
-    link, 
-    imageUrl, 
-    image, 
-    priority, 
+  async ({
+    body, // Renamed from message
+    title,
+    link,
+    imageUrl,
+    image,
+    priority,
     attachments,
     actions,
     template,
@@ -89,7 +144,7 @@ server.tool(
   }) => {
     // Handle image upload to Imgur if provided and Imgur is configured
     let finalImageUrl = imageUrl; // Use legacy imageUrl if provided
-    
+
     if (imgurUploader) {
       // If local image file path is provided, prioritize it
       if (image) {
@@ -104,7 +159,7 @@ server.tool(
           console.error("Failed to upload image file to Imgur:", error);
           finalImageUrl = undefined; // Don't use if upload failed
         }
-      } 
+      }
       // If only remote imageUrl is provided, upload that to Imgur
       else if (imageUrl) {
         try {
@@ -122,9 +177,9 @@ server.tool(
     // Construct the notification message object
     const notificationMessage: NotificationMessage = {
       title,
-      body: message,
+      body: body, // Use renamed 'body'
       link,
-      imageUrl: finalImageUrl, 
+      imageUrl: finalImageUrl,
       priority,
       attachments,
       actions,
@@ -132,18 +187,8 @@ server.tool(
       templateData
     };
 
-    // Send webhook using the formatter's prepareRequest method
-    const request = webhookFormatter.prepareRequest(notificationMessage);
-    const response = await fetch(request.url, {
-      method: request.method,
-      headers: request.headers,
-      body: request.body
-    });
-
-    const data = await response.text();
-    return {
-      content: [{ type: "text", text: data }]
-    };
+    // Send webhook using the helper function
+    return sendNotification(notificationMessage);
   }
 );
 
