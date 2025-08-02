@@ -20,6 +20,7 @@ Currently maintained by [zudsniper](https://github.com/zudsniper).
 - **Customizable Messages**: Send personalized notifications with title, body, and links
 - **Discord Embed Support**: Send rich, customizable Discord embed notifications
 - **Discord Webhook Example**: Now includes a sample Discord webhook config (`discord_webhook.json`) and test script (`src/test-discord.js`)
+- **ntfy Webhook Example**: Includes a sample ntfy config (`ntfy-webhook.json`) and test script (`src/test-ntfy.js`)
 - **Improved Discord/NTFY Logic**: Enhanced webhook handling and configuration types
 
 ## Installation
