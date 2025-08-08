@@ -18,6 +18,9 @@ A lightweight notification service that integrates with MCP (Model Context Proto
 - **Customizable Messages**: Send personalized notifications with title, body, and links
 - **Discord Embed Support**: Send rich, customizable Discord embed notifications
 - **NTFY Template Support**: Use pre-defined templates for status, questions, progress, and problems.
+- **Discord Webhook Example**: Now includes a sample Discord webhook config (`discord_webhook.json`) and test script (`src/test-discord.js`)
+- **ntfy Webhook Example**: Includes a sample ntfy config (`ntfy-webhook.json`) and test script (`src/test-ntfy.js`)
+- **Improved Discord/NTFY Logic**: Enhanced webhook handling and configuration types
 
 ## Installation
 
