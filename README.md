@@ -1,14 +1,12 @@
-# MCP Server Notifier
+# MCP Notifications
+
+> This project is a spiritual successor to the original `mcp-server-notifier` by [tuberrabbit@gmail.com](mailto:tuberrabbit@gmail.com), and has been significantly rewritten and is now maintained by [zudsniper](https://github.com/zudsniper).
 
 A lightweight notification service that integrates with MCP (Model Context Protocol) to send webhooks when AI agents complete tasks.
 
 [简体中文文档](./docs/README_zh.md)
 
-![MCP Server Notifier](./docs/images/banner.png)
-
-## Authors
-Originally created by [tuberrabbit@gmail.com](mailto:tuberrabbit@gmail.com).  
-Currently maintained by [zudsniper](https://github.com/zudsniper).
+![MCP Notifications](./docs/images/banner.png)
 
 ## Features
 
@@ -19,6 +17,7 @@ Currently maintained by [zudsniper](https://github.com/zudsniper).
 - **Easy Integration**: Simple setup with AI tools like Cursor
 - **Customizable Messages**: Send personalized notifications with title, body, and links
 - **Discord Embed Support**: Send rich, customizable Discord embed notifications
+- **NTFY Template Support**: Use pre-defined templates for status, questions, progress, and problems.
 - **Discord Webhook Example**: Now includes a sample Discord webhook config (`discord_webhook.json`) and test script (`src/test-discord.js`)
 - **ntfy Webhook Example**: Includes a sample ntfy config (`ntfy-webhook.json`) and test script (`src/test-ntfy.js`)
 - **Improved Discord/NTFY Logic**: Enhanced webhook handling and configuration types
@@ -28,10 +27,12 @@ Currently maintained by [zudsniper](https://github.com/zudsniper).
 ### Option 1: Using npm
 
 ```bash
-npm install -g mcp-server-notifier
+npm install -g mcp-notifications
 ```
 
 ### Option 2: Using Docker
+
+The Docker image name is not yet updated, but you can pull the latest version of the old image for now.
 
 ```bash
 docker pull zudsniper/mcp-server-notifier:latest
@@ -55,7 +56,7 @@ npm run build
 
 1. Go to your 'Cursor Settings'
 2. Click `MCP` in the sidebar, then click `+ Add new global MCP server`
-3. Add `mcp-server-notifier`.  
+3. Add `mcp-notifications`.
 ```json
 {
    "mcpServers": {
@@ -63,7 +64,7 @@ npm run build
          "command": "npx",
          "args": [
             "-y",
-            "mcp-server-notifier"
+            "mcp-notifications"
          ],
          "env": {
             "WEBHOOK_URL": "https://ntfy.sh/webhook-url-example",
@@ -89,7 +90,7 @@ By default, the notifier supports several webhook types:
 You can specify the webhook type and URL through environment variables:
 
 ```bash
-env WEBHOOK_URL="https://your-webhook-url" WEBHOOK_TYPE="discord" npx -y mcp-server-notifier
+env WEBHOOK_URL="https://your-webhook-url" WEBHOOK_TYPE="discord" npx -y mcp-notifications
 ```
 ### Authentication Tokens
 
@@ -101,12 +102,12 @@ env WEBHOOK_URL="https://your-webhook-url" WEBHOOK_TYPE="discord" npx -y mcp-ser
 **Example:**
 
 ```bash
-env WEBHOOK_URL="https://ntfy.sh/your-topic" WEBHOOK_TYPE="ntfy" WEBHOOK_TOKEN="your-secret-token" npx -y mcp-server-notifier
+env WEBHOOK_URL="https://ntfy.sh/your-topic" WEBHOOK_TYPE="ntfy" WEBHOOK_TOKEN="your-secret-token" npx -y mcp-notifications
 ```
 
 ### Configuration File
 
-For more advanced configuration, you can create a `webhook-config.json` file:
+For more advanced configuration, you can create a `webhook-config.json` file in your current directory or in `~/.config/mcp-notifier/webhook-config.json`:
 
 ```json
 {
@@ -125,105 +126,74 @@ See the [Configuration Guide](./docs/CONFIGURATION.md) for full details and exam
 
 ## Usage
 
-- Ask your AI agent to notify you with a custom message when a task is complete
-- Configure it as a persistent rule in Cursor settings to avoid repeating the setup
-
 For detailed usage instructions, see the [Usage Guide](./docs/USAGE.md).
 
 ### Available Tools
 
-1. `notify`
-   - **Purpose**: Send rich notifications to any configured webhook
-   - **Input**: 
-     - `message` - Text content of the notification
-     - `title` (optional) - Title for the notification
-     - `link` (optional) - URL to include in the notification (used as click action for ntfy)
-     - `imageUrl` (optional) - URL of an image to include (legacy, use `image` or `attachments`)
-     - `image` (optional) - Local file path of an image to upload to Imgur
-     - `priority` (optional, ntfy only) - Notification priority (1-5)
-     - `attachments` (optional, ntfy only) - Array of URLs to attach
-     - `template` (optional, ntfy only) - Predefined template to use: status, question, progress, problem
-     - `templateData` (optional, ntfy only) - Data to populate the chosen template
-     - `actions` (optional, ntfy only) - Array of action button definitions (`view` or `http`)
-   - **Best for**: General notification needs
+This package provides two tools for sending notifications:
 
-> **Note:** Template functionality is currently under development and has limited support. Templates work best with ntfy.sh but may not be fully implemented for all webhook providers. See the ROADMAP.md file for future implementation plans.
+1. `notify` - for simple notifications.
+2. `full_notify` - for more advanced notifications with all features.
+
+#### `notify`
+Send a simple notification with body, optional title, and optional template.
+
+**Input**:
+- `body`: The main content of the notification message.
+- `title` (optional): The title for the notification.
+- `template` (optional): A predefined template to use (e.g., 'status', 'question', 'progress', 'problem').
+
+**Example**:
+```javascript
+// AI agent call
+await run("notify", {
+  title: "Task Completed",
+  body: "I have finished the task."
+});
+```
+
+#### `full_notify`
+Send a detailed notification with advanced options like a link, image, priority, attachments, actions, and template data.
+
+**Input**:
+- `body`: The main content of the notification message.
+- `title` (optional): The title for the notification.
+- `link` (optional): A URL to include in the notification.
+- `imageUrl` (optional): The URL of an image to include.
+- `image` (optional): The local file path for an image to upload to Imgur.
+- `priority` (optional, ntfy only): Notification priority level from 1-5 (5 is the highest).
+- `attachments` (optional, ntfy only): A list of URLs to attach to the notification.
+- `template` (optional): A predefined template to use.
+- `templateData` (optional): Data to be used with the selected template.
+- `actions` (optional, ntfy only): Interactive action buttons for the notification.
+
+**Example**:
+```javascript
+// AI agent call
+await run("full_notify", {
+  title: "Server Alert",
+  body: "Disk usage is high!",
+  priority: 5,
+  actions: [
+    {
+      action: "view",
+      label: "Open Grafana",
+      url: "https://grafana.example.com/d/abcdefg"
+    }
+  ]
+});
+```
 
 ### NTFY Templates
 
-When using ntfy.sh as your webhook provider, you can use the following predefined templates:
+When using ntfy.sh as your webhook provider, you can use the following predefined templates with the `template` and `templateData` parameters:
 
-1. **Status Template** (`status`)
-   - **Purpose**: Send status updates about systems, processes, or tasks
-   - **Data Fields**:
-     - `status` - Current status (e.g., "online", "completed", "pending")
-     - `details` (optional) - Additional information about the status
-     - `timestamp` (optional) - When this status was recorded
-     - `component` (optional) - The system component this status applies to
+- `status`: For sending status updates.
+- `question`: For asking questions.
+- `progress`: For tracking the progress of long-running tasks.
+- `problem`: For reporting errors or issues.
 
-2. **Question Template** (`question`)
-   - **Purpose**: Ask questions that require a response
-   - **Data Fields**:
-     - `question` - The main question being asked
-     - `context` (optional) - Background information for the question
-     - `options` (optional) - Possible answer options
-     - `deadline` (optional) - When a response is needed by
-
-3. **Progress Template** (`progress`)
-   - **Purpose**: Track progress of long-running tasks
-   - **Data Fields**:
-     - `title` - Name of the task or process
-     - `current` - Current progress value
-     - `total` - Total value to reach completion
-     - `percentage` (optional) - Explicit percentage value (calculated if not provided)
-     - `eta` (optional) - Estimated time to completion
-     - `details` (optional) - Additional information about the progress
-
-4. **Problem Template** (`problem`)
-   - **Purpose**: Report errors or issues
-   - **Data Fields**:
-     - `title` - Short description of the problem
-     - `description` (optional) - Detailed information about the problem
-     - `severity` (optional) - How severe the problem is (e.g., "critical", "warning")
-     - `source` (optional) - Where the problem originated
-     - `timestamp` (optional) - When the problem occurred
-     - `solution` (optional) - Suggested ways to fix the problem
-
-**Example Using Template**:
-```javascript
-// Send a progress notification
-{
-  "template": "progress",
-  "templateData": {
-    "title": "Database Backup",
-    "current": 75,
-    "total": 100,
-    "eta": "2 minutes remaining",
-    "details": "Compressing backup files"
-  },
-  "priority": 3
-}
-```
-
-## Docker Support
-
-The MCP Server Notifier is available as a Docker image:
-
-```bash
-docker pull zudsniper/mcp-server-notifier:latest
-```
-
-Run with environment variables:
-
-```bash
-docker run -e WEBHOOK_URL=https://your-webhook-url -e WEBHOOK_TYPE=discord zudsniper/mcp-server-notifier
-```
-
-## Example Configurations
-
-Example webhook configurations are available in the [examples](./examples) directory.
-
-A new example for Discord webhook configuration is provided in `discord_webhook.json` at the project root.
+See [docs/NOTIFICATIONS.md](./docs/NOTIFICATIONS.md) for more details on templates.
 
 ## Development
 
@@ -245,8 +215,6 @@ npm install
 npm run build
 ```
 
-- Node version management is now supported via `.nvmrc` for consistent development environments.
-
 ### Testing Your Changes
 
 1. Run the MCP server in development mode:
@@ -257,28 +225,6 @@ npm install -g @modelcontextprotocol/inspector
 # Start the server with the Inspector
 npx @modelcontextprotocol/inspector node build/index.js
 ```
-
-2. The Inspector provides a web interface where you can:
-   - Send requests to your tools
-   - View request/response logs
-   - Debug issues with your implementation
-
-### Releasing New Versions
-
-To release a new version:
-
-1. Update version in `package.json`
-2. Push changes to the `release` branch
-3. GitHub Actions will automatically:
-   - Run tests
-   - Build and push Docker images
-   - Publish to npm
-   - Create a GitHub Release
-
-Required repository secrets for CI/CD:
-- `DOCKERHUB_USERNAME` - Docker Hub username
-- `DOCKERHUB_TOKEN` - Docker Hub access token
-- `NPM_TOKEN` - npm access token
 
 ## License
 
