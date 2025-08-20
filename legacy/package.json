@@ -1,0 +1,52 @@
+{
+  "name": "mcp-notifications-legacy",
+  "bin": {
+    "mcp-notifications": "./build/index.js"
+  },
+  "version": "2.5.0",
+  "description": "Lightweight Node.js server for sending webhook notifications. Supports Discord, Slack, Teams, Feishu, and custom webhooks. Ideal for AI-assisted developers working across multiple projects.",
+  "main": "build/index.js",
+  "authors": [
+    {
+      "name": "tuberrabbit",
+      "email": "tuberrabbit@gmail.com"
+    },
+    {
+      "name": "Jason McElhenny",
+      "email": "me@zod.tf",
+      "url": "https://github.com/zudsniper"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zudsniper/mcp-server-notifier.git"
+  },
+  "keywords": [
+    "mcp",
+    "feishu",
+    "discord",
+    "slack",
+    "teams",
+    "webhook",
+    "notification",
+    "ai",
+    "developer",
+    "tool",
+    "imgur"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.9.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.14.0",
+    "typescript": "5.8.3"
+  }
+}

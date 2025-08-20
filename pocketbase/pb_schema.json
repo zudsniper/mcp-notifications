@@ -1,0 +1,490 @@
+{
+  "collections": [
+    {
+      "id": "users",
+      "name": "users",
+      "type": "auth",
+      "system": false,
+      "schema": [
+        {
+          "id": "name",
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "avatar",
+          "name": "avatar",
+          "type": "file",
+          "required": false,
+          "options": {
+            "maxSelect": 1,
+            "maxSize": 5242880,
+            "mimeTypes": [
+              "image/jpeg",
+              "image/png",
+              "image/svg+xml",
+              "image/gif",
+              "image/webp"
+            ],
+            "thumbs": null
+          }
+        }
+      ],
+      "indexes": [],
+      "listRule": "id = @request.auth.id",
+      "viewRule": "id = @request.auth.id",
+      "createRule": "",
+      "updateRule": "id = @request.auth.id",
+      "deleteRule": "id = @request.auth.id",
+      "options": {
+        "allowEmailAuth": true,
+        "allowOAuth2Auth": true,
+        "allowUsernameAuth": false,
+        "exceptEmailDomains": null,
+        "manageRule": null,
+        "minPasswordLength": 8,
+        "onlyEmailDomains": null,
+        "requireEmail": false
+      }
+    },
+    {
+      "id": "webhook_configs",
+      "name": "webhook_configs",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "id": "user_id",
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "users",
+            "cascadeDelete": true,
+            "minSelect": null,
+            "maxSelect": 1,
+            "displayFields": ["email"]
+          }
+        },
+        {
+          "id": "name",
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": 100,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "url",
+          "name": "url",
+          "type": "url",
+          "required": true,
+          "options": {
+            "exceptDomains": null,
+            "onlyDomains": null
+          }
+        },
+        {
+          "id": "type",
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "options": {
+            "maxSelect": 1,
+            "values": [
+              "discord",
+              "slack",
+              "teams",
+              "feishu",
+              "ntfy",
+              "generic",
+              "custom"
+            ]
+          }
+        },
+        {
+          "id": "token",
+          "name": "token",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "default_priority",
+          "name": "default_priority",
+          "type": "number",
+          "required": false,
+          "options": {
+            "min": 1,
+            "max": 5
+          }
+        },
+        {
+          "id": "templates",
+          "name": "templates",
+          "type": "json",
+          "required": false,
+          "options": {}
+        },
+        {
+          "id": "default_actions",
+          "name": "default_actions",
+          "type": "json",
+          "required": false,
+          "options": {}
+        },
+        {
+          "id": "username",
+          "name": "username",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": 50,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "avatar_url",
+          "name": "avatar_url",
+          "type": "url",
+          "required": false,
+          "options": {
+            "exceptDomains": null,
+            "onlyDomains": null
+          }
+        },
+        {
+          "id": "fallback_url",
+          "name": "fallback_url",
+          "type": "url",
+          "required": false,
+          "options": {
+            "exceptDomains": null,
+            "onlyDomains": null
+          }
+        },
+        {
+          "id": "fallback_type",
+          "name": "fallback_type",
+          "type": "select",
+          "required": false,
+          "options": {
+            "maxSelect": 1,
+            "values": [
+              "discord",
+              "slack",
+              "teams",
+              "feishu",
+              "ntfy",
+              "generic",
+              "custom"
+            ]
+          }
+        },
+        {
+          "id": "is_active",
+          "name": "is_active",
+          "type": "bool",
+          "required": false,
+          "options": {}
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX `idx_webhook_configs_user_id` ON `webhook_configs` (`user_id`)"
+      ],
+      "listRule": "user_id = @request.auth.id",
+      "viewRule": "user_id = @request.auth.id",
+      "createRule": "user_id = @request.auth.id",
+      "updateRule": "user_id = @request.auth.id",
+      "deleteRule": "user_id = @request.auth.id",
+      "options": {}
+    },
+    {
+      "id": "sse_connections",
+      "name": "sse_connections",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "id": "user_id",
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "users",
+            "cascadeDelete": true,
+            "minSelect": null,
+            "maxSelect": 1,
+            "displayFields": ["email"]
+          }
+        },
+        {
+          "id": "connection_id",
+          "name": "connection_id",
+          "type": "text",
+          "required": true,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "user_agent",
+          "name": "user_agent",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": 500,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "ip_address",
+          "name": "ip_address",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": 45,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "connected_at",
+          "name": "connected_at",
+          "type": "date",
+          "required": true,
+          "options": {
+            "min": "",
+            "max": ""
+          }
+        },
+        {
+          "id": "last_ping",
+          "name": "last_ping",
+          "type": "date",
+          "required": false,
+          "options": {
+            "min": "",
+            "max": ""
+          }
+        },
+        {
+          "id": "is_active",
+          "name": "is_active",
+          "type": "bool",
+          "required": false,
+          "options": {}
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX `idx_sse_connections_connection_id` ON `sse_connections` (`connection_id`)",
+        "CREATE INDEX `idx_sse_connections_user_id` ON `sse_connections` (`user_id`)",
+        "CREATE INDEX `idx_sse_connections_active` ON `sse_connections` (`is_active`)"
+      ],
+      "listRule": "user_id = @request.auth.id",
+      "viewRule": "user_id = @request.auth.id",
+      "createRule": "user_id = @request.auth.id",
+      "updateRule": "user_id = @request.auth.id",
+      "deleteRule": "user_id = @request.auth.id",
+      "options": {}
+    },
+    {
+      "id": "notification_history",
+      "name": "notification_history",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "id": "user_id",
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "users",
+            "cascadeDelete": true,
+            "minSelect": null,
+            "maxSelect": 1,
+            "displayFields": ["email"]
+          }
+        },
+        {
+          "id": "connection_id",
+          "name": "connection_id",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "message",
+          "name": "message",
+          "type": "json",
+          "required": true,
+          "options": {}
+        },
+        {
+          "id": "webhook_config",
+          "name": "webhook_config",
+          "type": "json",
+          "required": true,
+          "options": {}
+        },
+        {
+          "id": "status",
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "options": {
+            "maxSelect": 1,
+            "values": [
+              "sent",
+              "failed",
+              "fallback"
+            ]
+          }
+        },
+        {
+          "id": "response",
+          "name": "response",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "error",
+          "name": "error",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "sent_at",
+          "name": "sent_at",
+          "type": "date",
+          "required": true,
+          "options": {
+            "min": "",
+            "max": ""
+          }
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX `idx_notification_history_user_id` ON `notification_history` (`user_id`)",
+        "CREATE INDEX `idx_notification_history_sent_at` ON `notification_history` (`sent_at`)",
+        "CREATE INDEX `idx_notification_history_status` ON `notification_history` (`status`)"
+      ],
+      "listRule": "user_id = @request.auth.id",
+      "viewRule": "user_id = @request.auth.id",
+      "createRule": "user_id = @request.auth.id",
+      "updateRule": "user_id = @request.auth.id",
+      "deleteRule": "user_id = @request.auth.id",
+      "options": {}
+    },
+    {
+      "id": "notification_templates",
+      "name": "notification_templates",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "id": "user_id",
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "users",
+            "cascadeDelete": true,
+            "minSelect": null,
+            "maxSelect": 1,
+            "displayFields": ["email"]
+          }
+        },
+        {
+          "id": "name",
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 50,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "title_template",
+          "name": "title_template",
+          "type": "text",
+          "required": false,
+          "options": {
+            "min": null,
+            "max": 200,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "body_template",
+          "name": "body_template",
+          "type": "text",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 2000,
+            "pattern": ""
+          }
+        },
+        {
+          "id": "default_data",
+          "name": "default_data",
+          "type": "json",
+          "required": false,
+          "options": {}
+        },
+        {
+          "id": "is_system",
+          "name": "is_system",
+          "type": "bool",
+          "required": false,
+          "options": {}
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX `idx_notification_templates_user_id` ON `notification_templates` (`user_id`)",
+        "CREATE INDEX `idx_notification_templates_name` ON `notification_templates` (`name`)"
+      ],
+      "listRule": "user_id = @request.auth.id || is_system = true",
+      "viewRule": "user_id = @request.auth.id || is_system = true",
+      "createRule": "user_id = @request.auth.id && is_system != true",
+      "updateRule": "user_id = @request.auth.id && is_system != true",
+      "deleteRule": "user_id = @request.auth.id && is_system != true",
+      "options": {}
+    }
+  ]
+}
