@@ -48,12 +48,12 @@ migrate((db) => {
     }
   ];
 
-  // Insert system templates with a fake user_id that will be replaced in actual usage
+  // Insert system templates with null user_id for system-wide availability
   const collection = $app.dao().findCollectionByNameOrId("notification_templates");
   
   templates.forEach(template => {
     const record = new Record(collection, {
-      user_id: '', // Will be handled differently for system templates
+      user_id: null, // Set to null for system templates to avoid constraint violations
       name: template.name,
       title_template: template.title_template,
       body_template: template.body_template,

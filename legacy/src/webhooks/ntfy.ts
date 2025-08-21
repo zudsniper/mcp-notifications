@@ -9,6 +9,9 @@ import http from 'http';
 import urlModule from 'url';
 
 const fs = fsModule.promises;
+
+// Define a safe base directory for attachments (customize as needed)
+const ATTACHMENTS_DIR = process.env.ATTACHMENTS_DIR || path.resolve(process.cwd(), 'attachments');
 /**
  * Formatter for ntfy webhooks
  * 
@@ -126,9 +129,17 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     const config = this.config;
     const requests = [];
 
-    function isLocalFile(filePath: string): boolean {
+    async function isLocalFile(filePath: string): Promise<boolean> {
       try {
-        return Boolean(filePath) && fsModule.existsSync(filePath) && fsModule.statSync(filePath).isFile();
+        if (!filePath) return false;
+        const resolvedPath = path.resolve(filePath);
+        // Ensure the file is within the allowed directory
+        if (!resolvedPath.startsWith(ATTACHMENTS_DIR + path.sep)) {
+          return false;
+        }
+        await fs.access(resolvedPath);
+        const stat = await fs.stat(resolvedPath);
+        return stat.isFile();
       } catch {
         return false;
       }
@@ -154,9 +165,9 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     let attachmentUrls: string[] = message.attachments ? [...message.attachments] : [];
 
     const filePath = message.imageUrl; // support imageUrl for backward compatibility
-    if (filePath && isLocalFile(filePath)) {
+    if (filePath && await isLocalFile(filePath)) {
       try {
-        const stat = fsModule.statSync(filePath);
+        const stat = await fs.stat(filePath);
         const maxSize = 15 * 1024 * 1024;
         if (stat.size <= maxSize) {
           const topicUrl = config.url;

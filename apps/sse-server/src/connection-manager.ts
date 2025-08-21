@@ -13,16 +13,13 @@ export class SSEConnectionManager implements DurableObject {
   private state: DurableObjectState;
   private env: Env;
   private connections: Map<string, { connection: SSEConnection; controller: ReadableStreamDefaultController }> = new Map();
-  private cleanupInterval?: number;
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
     this.env = env;
     
-    // Setup periodic cleanup
-    this.cleanupInterval = setInterval(() => {
-      this.cleanupStaleConnections();
-    }, 30000); // Every 30 seconds
+    // Schedule the first cleanup alarm
+    this.state.storage.setAlarm(Date.now() + 30000); // 30 seconds from now
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -278,11 +275,11 @@ export class SSEConnectionManager implements DurableObject {
     }
   }
 
-  // Cleanup when durable object is evicted
+  // Alarm handler for periodic cleanup
   async alarm(): Promise<void> {
     await this.cleanupStaleConnections();
     
-    // Schedule next cleanup
-    await this.state.storage.setAlarm(Date.now() + 300000); // 5 minutes
+    // Schedule next cleanup (every 30 seconds for active cleanup)
+    await this.state.storage.setAlarm(Date.now() + 30000); // 30 seconds
   }
 }

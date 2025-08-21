@@ -41,7 +41,7 @@ export class SSEClient {
     this.eventSource.onopen = () => {
       console.log('SSE connection opened');
       this.reconnectAttempts = 0;
-      this.options.onConnectionStatus?.(connected);
+      this.options.onConnectionStatus?.('connected');
     };
 
     this.eventSource.onmessage = (event) => {
@@ -176,9 +176,12 @@ export class SSEClient {
     this.reconnectAttempts++;
     this.options.onConnectionStatus?.('reconnecting');
 
+    // Use a moderate base multiplier (default 1000ms, min 500ms, max 5000ms)
+    const baseInterval = Math.max(500, Math.min(this.options.reconnectInterval ?? 1000, 5000));
+    // Cap maximum delay at 10 seconds
     const delay = Math.min(
-      this.options.reconnectInterval! * Math.pow(2, this.reconnectAttempts - 1),
-      30000 // Max 30 seconds
+      baseInterval * Math.pow(2, this.reconnectAttempts - 1),
+      10000 // Max 10 seconds
     );
 
     console.log(`Scheduling reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
