@@ -1,0 +1,37 @@
+name = "mcp-notifications-sse"
+main = "src/index.ts"
+compatibility_date = "2024-12-18"
+
+[env.production]
+name = "mcp-notifications-sse"
+
+[env.staging]
+name = "mcp-notifications-sse-staging"
+
+# Environment variables (set these in Cloudflare dashboard or via wrangler secret)
+[vars]
+POCKETBASE_URL = "https://your-pocketbase-instance.com"
+CORS_ORIGIN = "https://your-frontend-domain.com"
+ENVIRONMENT = "development"
+
+# Durable Object for connection management
+[[durable_objects.bindings]]
+name = "SSE_CONNECTIONS"
+class_name = "SSEConnectionManager"
+
+# KV for rate limiting and caching
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-namespace-id"
+
+# Queue for webhook processing
+[[queues.producers]]
+binding = "WEBHOOK_QUEUE"
+queue = "webhook-notifications"
+
+[[queues.consumers]]
+queue = "webhook-notifications"
+max_batch_size = 10
+max_batch_timeout = 30
+max_retries = 3
