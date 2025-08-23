@@ -18,6 +18,25 @@ const fs = fsModule.promises;
  * @see https://docs.ntfy.sh/publish/
  */
 export class NtfyWebhookFormatter extends BaseWebhookFormatter {
+  /**
+   * Ensure URL has proper protocol prefix
+   */
+  private ensureValidUrl(url: string): string {
+    if (!url) return url;
+    
+    // If URL already has protocol, return as is
+    if (url.match(/^https?:\/\//)) {
+      return url;
+    }
+    
+    // If URL starts with ntfy.sh or any domain, add https://
+    if (url.match(/^[a-zA-Z0-9.-]+\//)) {
+      return `https://${url}`;
+    }
+    
+    return url;
+  }
+
   formatMessage(message: NotificationMessage): any {
     let body = message.body;
     
@@ -107,7 +126,7 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     }
 
     return {
-      url: config.url,
+      url: this.ensureValidUrl(config.url),
       method: 'POST',
       headers: headers,
       body: this.formatMessage(message)
@@ -159,7 +178,7 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
         const stat = fsModule.statSync(filePath);
         const maxSize = 15 * 1024 * 1024;
         if (stat.size <= maxSize) {
-          const topicUrl = config.url;
+          const topicUrl = this.ensureValidUrl(config.url);
           const parsedUrl = new URL(topicUrl);
           const topic = parsedUrl.pathname.replace(/^\//, '');
           const filename = path.basename(filePath);
@@ -238,7 +257,7 @@ export class NtfyWebhookFormatter extends BaseWebhookFormatter {
     // Only add POST request if no image upload PUT was added
     if (requests.length === 0) {
       requests.push({
-        url: config.url,
+        url: this.ensureValidUrl(config.url),
         method: 'POST',
         headers: headers,
         body: this.formatMessage(message)

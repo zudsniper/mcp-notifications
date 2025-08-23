@@ -161,14 +161,55 @@ Ntfy has the most complete implementation of all features:
 - **Priority**: Native support (1-5)
 - **Attachments**: Multiple attachments supported
 
-### Discord/Slack/Teams/Feishu
+### Discord
+
+Discord notifications are sent as rich embeds, which allows for a high degree of formatting.
+
+- **Templates**: Implemented using custom-formatted embeds.
+- **Priority**: Mapped to embed colors (e.g., red for high priority).
+- **Actions**: Rendered as clickable links within the embed.
+- **Attachments**: Displayed as fields in the embed.
+
+### Slack
+
+Slack notifications are sent using **Block Kit** and **attachments**, which provide a rich and interactive experience.
+
+#### Configuration
+
+To use Slack, set your `WEBHOOK_TYPE` to `slack` and provide an **Incoming Webhook URL**.
+
+1.  Create a new Slack App in your workspace if you don't have one already.
+2.  Navigate to **Incoming Webhooks** and activate it.
+3.  Click **Add New Webhook to Workspace**.
+4.  Choose the channel where you want messages to be posted and click **Authorize**.
+5.  Copy the provided webhook URL (e.g., `https://hooks.slack.com/services/...`). This is your `WEBHOOK_URL`.
+
+**Important**: The channel is determined by the webhook URL itself. If you want to send notifications to different channels, you must create a separate webhook for each one.
+
+#### Feature Implementation
+
+- **Templates**: Implemented using a combination of Block Kit and colored attachments.
+  - `status`: Adds a context block with a status icon and text.
+  - `progress`: Shows a text-based progress bar.
+  - `problem`: Uses a red attachment color and displays error details in a pre-formatted block.
+  - `question`: Lists options in the message body.
+- **Priority**: Mapped to the attachment color on the side of the message.
+  - 5 (High): Red
+  - 4 (Medium): Yellow
+  - 3 (Normal): Blue
+  - 1-2 (Low): Green
+- **Actions**: Rendered as interactive buttons. Note that all actions (`view` and `http`) are treated as simple links, as webhooks do not support custom HTTP requests from buttons.
+- **Attachments**: Appended as links in the message body.
+- **Images**: The `imageUrl` is displayed as a large image block.
+
+### Teams/Feishu
 
 These providers implement templating through custom formatting:
 
-- **Templates**: Formatted as structured messages/embeds
-- **Actions**: Limited support (typically as buttons or links)
-- **Priority**: Represented visually (e.g., colors, icons)
-- **Attachments**: Limited to single images in most cases
+- **Templates**: Formatted as structured messages/cards.
+- **Actions**: Limited support (typically as buttons or links).
+- **Priority**: Represented visually (e.g., colors, icons).
+- **Attachments**: Limited to single images in most cases.
 
 ### Generic/Custom
 

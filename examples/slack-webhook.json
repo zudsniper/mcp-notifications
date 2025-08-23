@@ -2,6 +2,11 @@
   "webhook": {
     "type": "slack",
     "url": "https://hooks.slack.com/services/your-slack-webhook-url",
-    "name": "Slack Task Notifier"
+    "name": "MCP Notifier",
+    "username": "MCP Bot",
+    "avatarUrl": "https://raw.githubusercontent.com/sammcj/mcp-icons/main/mcp-icon-128.png"
+  },
+  "imgur": {
+    "clientId": "your-imgur-client-id"
   }
 }
