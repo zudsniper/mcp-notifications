@@ -1,0 +1,21 @@
+{
+  "name": "@mcp-notifications/shared",
+  "version": "3.0.0",
+  "description": "Shared types and utilities for MCP Notifications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}

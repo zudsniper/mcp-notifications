@@ -1,11 +1,40 @@
 {
-  "name": "mcp-notifications",
-  "bin": {
-    "mcp-notifications": "./build/index.js"
+  "name": "mcp-notifications-monorepo",
+  "private": true,
+  "version": "3.0.0",
+  "description": "MCP Notifications with SSE server, Next.js webapp, and PocketBase backend",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "legacy"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules legacy/node_modules"
   },
-  "version": "2.5.2",
-  "description": "Lightweight Node.js server for sending webhook notifications. Supports Discord, Slack, Teams, Feishu, and custom webhooks. Ideal for AI-assisted developers working across multiple projects.",
-  "main": "build/index.js",
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "^22.14.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zudsniper/mcp-server-notifier.git"
+  },
+  "keywords": [
+    "mcp",
+    "notifications",
+    "sse",
+    "nextjs",
+    "pocketbase",
+    "cloudflare",
+    "webhook"
+  ],
   "authors": [
     {
       "name": "tuberrabbit",
@@ -17,36 +46,5 @@
       "url": "https://github.com/zudsniper"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zudsniper/mcp-server-notifier.git"
-  },
-  "keywords": [
-    "mcp",
-    "feishu",
-    "discord",
-    "slack",
-    "teams",
-    "webhook",
-    "notification",
-    "ai",
-    "developer",
-    "tool",
-    "imgur"
-  ],
-  "type": "module",
-  "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
-    "prepare": "npm run build",
-    "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "1.9.0",
-    "zod": "^3.22.4"
-  },
-  "devDependencies": {
-    "@types/node": "22.14.0",
-    "typescript": "5.8.3"
-  }
+  "license": "MIT"
 }
