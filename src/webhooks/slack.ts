@@ -1,4 +1,4 @@
-import { NotificationMessage, MessageAction } from '../config/types.js';
+import { NotificationMessage, NotificationAction } from '../config/types.js';
 import { BaseWebhookFormatter } from './base.js';
 import { getTemplate } from '../templates/notification.js';
 import { WebhookConfig } from '../config/types.js';
@@ -231,7 +231,7 @@ export class SlackWebhookFormatter extends BaseWebhookFormatter {
     }
   }
 
-  private createActionsBlock(actions: MessageAction[]): any {
+  private createActionsBlock(actions: NotificationAction[]): any {
     const elements = actions.map(action => {
       if (action.action === 'view') {
         return {
