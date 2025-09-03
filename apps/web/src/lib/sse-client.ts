@@ -1,6 +1,6 @@
 'use client';
 
-import type { SSEEvent, NotificationMessage } from '@mcp-notifications/shared';
+import type { SSEEvent, NotificationMessage } from '@/types';
 
 export interface SSEClientOptions {
   userId: string;

@@ -12,7 +12,6 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "next": "15.5.0",
-    "@mcp-notifications/shared": "workspace:*",
     "pocketbase": "^0.21.5",
     "react-hook-form": "^7.54.2",
     "@hookform/resolvers": "^3.10.0",
