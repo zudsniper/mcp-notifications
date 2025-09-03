@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { SSEClient, type SSEClientOptions } from '@/lib/sse-client';
 import { auth } from '@/lib/pocketbase';
-import type { NotificationMessage } from '@mcp-notifications/shared';
+import type { NotificationMessage } from '@/types';
 
 interface UseSSEOptions {
   autoConnect?: boolean;
